@@ -46,7 +46,7 @@ void KalmanFilter::Update(const VectorXd &z) {
 
   //new estimate
   x_ = x_ + (K * y);
-  long x_size = x_.size();
+  int x_size = x_.size();
   MatrixXd I = MatrixXd::Identity(x_size, x_size);
   P_ = (I - K * H_) * P_;
 }
@@ -58,15 +58,14 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   //given x state compute the h(x) to polar coordinate 
   // recover state parameters
-  float px = z(0);
-  float py = z(1);
-  float vx = z(2);
-  float vy = z(3);
-
+  double px = x_(0);
+  double py = x_(1);
+  double vx = x_(2);
+  double vy = x_(3);
   //precomute some terms
-  float c1 = px*px+py*py;
-  float c2 = sqrt(c1);
-  float c3 = (c1*c2);
+  double c1 = px*px+py*py;
+  double c2 = sqrt(c1);
+  double c3 = (c1*c2);
   
   // check division by zero
   if (fabs(c1) < 0.0001) {
@@ -74,14 +73,15 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     return;
   }
 
+  //std::cout << "Compute Innoavation"<<std::endl;
   //compute the h(x)
   VectorXd hx(3);
-  hx(1)  = c2;
-  hx(2) = atan2(py,px);
-  hx(3) = (px*vx + py*vy)/c3;
+  hx(0)  = c2;
+  hx(1) = atan2(py,px);
+  hx(2) = (px*vx + py*vy)/c2;
+  //std::cout << "Compute Innoavation Passed"<<std::endl;
 
   //compute the innnovation
-  VectorXd y(3);
   VectorXd y = z - hx;
 
   //normalised the angle to -pi to pi
@@ -95,7 +95,6 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   MatrixXd PHt = P_ * Ht;
   MatrixXd S = H_ * P_ * Ht + R_;
   MatrixXd Si = S.inverse();
-
   MatrixXd K = PHt * Si;
 
   //New estimate

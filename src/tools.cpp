@@ -54,18 +54,24 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
    * TODO:
    * Calculate a Jacobian here.
    */
-
+  //std::cout << "Now inside Calculate Jacobin" << endl;
   MatrixXd Hj(3,4);
+  //check the state size if it is leagal
+  if ( x_state.size() != 4 ) {
+      std::cout << "ERROR - CalculateJacobian () - The state vector must have size 4." << endl;
+     return Hj;
+  }
+  
   // recover state parameters
-  float px = x_state(0);
-  float py = x_state(1);
-  float vx = x_state(2);
-  float vy = x_state(3);
-
+  double px = x_state(0);
+  double py = x_state(1);
+  double vx = x_state(2);
+  double vy = x_state(3);
+  //std::cout << "Now inside Calculate Jacobin pass" << endl;
   // pre-compute a set of terms to avoid repeated calculation
-  float c1 = px*px+py*py;
-  float c2 = sqrt(c1);
-  float c3 = (c1*c2);
+  double c1 = px*px+py*py;
+  double c2 = sqrt(c1);
+  double c3 = (c1*c2);
 
   // check division by zero
   if (fabs(c1) < 0.0001) {
